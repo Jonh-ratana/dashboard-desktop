@@ -3,7 +3,7 @@
   "description": "IRCT desktop app",
   "author": "jonh",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "electron.cjs",
   "type": "module",
   "scripts": {
