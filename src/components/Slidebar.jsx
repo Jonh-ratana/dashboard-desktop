@@ -1,10 +1,10 @@
 import { NavLink } from "react-router-dom";
-import { FiGrid, FiHome } from "react-icons/fi";
+import { FiBarChart2, FiGrid, FiHome } from "react-icons/fi";
 
 const navItems = [
-  { to: "/", label: "Home", icon: FiHome, end: true },
+  { to: "/", label: "Dashboard", icon: FiBarChart2, end: true },
+  { to: "/home", label: "Home", icon: FiHome },
   { to: "/table", label: "Table", icon: FiGrid },
-  { to: "/table2", label: "Table", icon: FiGrid },
 ];
 
 export default function Slidebar({ collapsed = false }) {
