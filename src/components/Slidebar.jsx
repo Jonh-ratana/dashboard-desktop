@@ -4,6 +4,7 @@ import { FiGrid, FiHome } from "react-icons/fi";
 const navItems = [
   { to: "/", label: "Home", icon: FiHome, end: true },
   { to: "/table", label: "Table", icon: FiGrid },
+  { to: "/table2", label: "Table", icon: FiGrid },
 ];
 
 export default function Slidebar({ collapsed = false }) {

@@ -45,20 +45,6 @@ export default function Layout() {
     };
   }, []);
 
-  const checkUpdates = async () => {
-    if (!window.desktopAPI?.checkForUpdates) {
-      setUpdateState((prev) => ({
-        ...prev,
-        message: "Update check works only inside desktop app build.",
-      }));
-      return;
-    }
-    const result = await window.desktopAPI.checkForUpdates();
-    if (result?.message) {
-      setUpdateState((prev) => ({ ...prev, message: result.message }));
-    }
-  };
-
   const startUpdate = async () => {
     if (!window.desktopAPI?.startUpdate) return;
     setUpdateBusy(true);
@@ -92,22 +78,12 @@ export default function Layout() {
       </div>
 
       <main className="flex-1 p-6">
-        <div className="mb-4 flex items-center justify-end gap-3">
-          <button
-            type="button"
-            onClick={checkUpdates}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
-          >
-            Check Update
-          </button>
-          {updateState.message ? <p className="text-sm text-slate-600">{updateState.message}</p> : null}
-        </div>
         <Outlet />
       </main>
 
       {showUpdateLock ? (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/95 px-6">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-lg">
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/20 px-6 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white/95 p-6 text-center shadow-xl">
             <h2 className="text-xl font-semibold text-slate-900">Update Required</h2>
             <p className="mt-3 text-sm text-slate-600">
               {updateState.message || "A new update is available. Please update to continue."}

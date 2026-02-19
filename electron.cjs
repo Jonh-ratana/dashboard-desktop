@@ -1,6 +1,7 @@
 const path = require("path")
 const { app, BrowserWindow, Menu, nativeImage, ipcMain } = require("electron")
 const { autoUpdater } = require("electron-updater")
+const packageJson = require("./package.json")
 
 const APP_ICON_PATH = path.join(__dirname, "icons.png")
 let mainWindow = null
@@ -8,6 +9,17 @@ let updateState = {
   status: "idle",
   message: "",
   requiredUpdate: false,
+}
+
+function hasValidPublishConfig() {
+  const publish = packageJson?.build?.publish
+  const first = Array.isArray(publish) ? publish[0] : publish
+  const owner = first?.owner
+  const repo = first?.repo
+
+  if (!owner || !repo) return false
+  if (owner === "YOUR_GITHUB_USERNAME" || repo === "YOUR_REPO_NAME") return false
+  return true
 }
 
 function loadAppIcon() {
@@ -90,12 +102,15 @@ ipcMain.handle("app:check-for-updates", async () => {
     sendUpdateStatus("dev", message)
     return { ok: false, message }
   }
+  if (!hasValidPublishConfig()) {
+    return { ok: false, message: "Update server is not configured yet." }
+  }
 
   try {
     await autoUpdater.checkForUpdates()
     return { ok: true }
   } catch (error) {
-    const message = `Update check failed: ${error?.message || "unknown error"}`
+    const message = "Unable to check updates right now."
     sendUpdateStatus("error", message)
     return { ok: false, message }
   }
@@ -109,6 +124,11 @@ ipcMain.handle("app:start-update", async () => {
   if (!app.isPackaged) {
     const message = "Updates are available only in packaged app."
     sendUpdateStatus("dev", message)
+    return { ok: false, message }
+  }
+  if (!hasValidPublishConfig()) {
+    const message = "Update server is not configured yet."
+    sendUpdateStatus("error", message)
     return { ok: false, message }
   }
 
@@ -132,9 +152,9 @@ app.whenReady().then(() => {
   createWindow()
   setupAutoUpdater()
 
-  if (app.isPackaged) {
+  if (app.isPackaged && hasValidPublishConfig()) {
     autoUpdater.checkForUpdates().catch((error) => {
-      sendUpdateStatus("error", `Update check failed: ${error?.message || "unknown error"}`)
+      sendUpdateStatus("error", "Unable to check updates right now.")
     })
   }
 })
