@@ -1,5 +1,7 @@
 {
   "name": "my-desktop-app",
+  "description": "IRCT desktop app",
+  "author": "jonh",
   "private": true,
   "version": "0.0.0",
   "main": "electron.cjs",
@@ -11,11 +13,15 @@
     "build": "vite build",
     "pack": "npm run build && electron-builder --dir",
     "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win nsis",
     "dist:linux": "npm run build && electron-builder --linux AppImage",
+    "git:rebase": "git pull --rebase",
+    "release:win": "npm run git:rebase && npm run dist:win",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "electron-updater": "^6.6.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-icons": "^5.5.0",
@@ -30,7 +36,7 @@
     "autoprefixer": "^10.4.24",
     "concurrently": "^9.2.1",
     "electron": "^40.5.0",
-    "electron-builder": "^26.0.12",
+    "electron-builder": "^26.8.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
@@ -49,8 +55,32 @@
     "files": [
       "dist/**/*",
       "electron.cjs",
+      "preload.cjs",
       "icons.png",
       "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "icons.png",
+      "artifactName": "IRCT-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "IRCT"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "YOUR_GITHUB_USERNAME",
+        "repo": "YOUR_REPO_NAME"
+      }
     ],
     "linux": {
       "target": [
