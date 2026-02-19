@@ -74,8 +74,8 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "YOUR_GITHUB_USERNAME",
-        "repo": "YOUR_REPO_NAME"
+        "owner": "Jonh-ratana",
+        "repo": "dashboard-desktop"
       }
     ],
     "linux": {
