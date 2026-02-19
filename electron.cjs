@@ -4,7 +4,9 @@ const { autoUpdater } = require("electron-updater")
 const packageJson = require("./package.json")
 
 const APP_ICON_PATH = path.join(__dirname, "icons.png")
+const UPDATE_CHECK_INTERVAL_MS = 5 * 60 * 1000
 let mainWindow = null
+let updateCheckTimer = null
 let updateState = {
   status: "idle",
   message: "",
@@ -96,6 +98,13 @@ function setupAutoUpdater() {
   })
 }
 
+function triggerUpdateCheck() {
+  if (!app.isPackaged || !hasValidPublishConfig()) return
+  autoUpdater.checkForUpdates().catch(() => {
+    sendUpdateStatus("error", "Unable to check updates right now.")
+  })
+}
+
 ipcMain.handle("app:check-for-updates", async () => {
   if (!app.isPackaged) {
     const message = "Update check is available only in packaged app."
@@ -151,14 +160,20 @@ app.whenReady().then(() => {
   }
   createWindow()
   setupAutoUpdater()
+  triggerUpdateCheck()
 
   if (app.isPackaged && hasValidPublishConfig()) {
-    autoUpdater.checkForUpdates().catch((error) => {
-      sendUpdateStatus("error", "Unable to check updates right now.")
-    })
+    updateCheckTimer = setInterval(triggerUpdateCheck, UPDATE_CHECK_INTERVAL_MS)
   }
 })
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit()
+})
+
+app.on("before-quit", () => {
+  if (updateCheckTimer) {
+    clearInterval(updateCheckTimer)
+    updateCheckTimer = null
+  }
 })
